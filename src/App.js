@@ -1,26 +1,37 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect } from 'react';
+import Typography from '@material-ui/core/Typography';
+import Container from '@material-ui/core/Container';
 
-function App() {
+import TaskForm from './components/TaskForm';
+import TaskList from './components/Tasklist';
+import useTaskState from './hooks/useTasksState';
+
+const App = () => {
+  const { tasks, addTask, deleteTask, setTasks } = useTaskState([]);
+
+  const saveTaskHandler = (taskText) => {
+    const trimmedText = taskText.trim();
+    if (trimmedText.length > 0) {
+      addTask(trimmedText);
+    }
+  };
+
+  useEffect(() => {
+    const tasksList = JSON.parse(localStorage.getItem('tasks'));
+    setTasks(tasksList);
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Container maxWidth="sm">
+        <Typography component="h1" variant="h2">
+          TaskList
+        </Typography>
+        <TaskForm saveTask={saveTaskHandler} />
+        <TaskList tasks={tasks} deleteTask={deleteTask} />
+      </Container>
+    </>
   );
-}
+};
 
 export default App;
