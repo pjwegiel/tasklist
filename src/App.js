@@ -1,3 +1,5 @@
+/* eslint-disable comma-dangle */
+/* eslint-disable object-curly-newline */
 import React, { useEffect } from 'react';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
@@ -7,8 +9,11 @@ import TaskList from './components/Tasklist';
 import useTaskState from './hooks/useTasksState';
 
 const App = () => {
-  const { tasks, addTask, deleteTask, setTasks } = useTaskState([]);
+  const { tasks, addTask, deleteTask, setTasks, checkedTask } = useTaskState(
+    []
+  );
 
+  // Method to handle adding task
   const saveTaskHandler = (taskText) => {
     const trimmedText = taskText.trim();
     if (trimmedText.length > 0) {
@@ -17,9 +22,15 @@ const App = () => {
   };
 
   useEffect(() => {
-    const tasksList = JSON.parse(localStorage.getItem('tasks'));
-    setTasks(tasksList);
-  }, []);
+    const interval = setInterval(() => {
+      let tasksList = [];
+      if (localStorage.getItem('tasks')) {
+        tasksList = JSON.parse(localStorage.getItem('tasks'));
+      }
+      setTasks(tasksList);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [setTasks]);
 
   return (
     <>
@@ -28,7 +39,11 @@ const App = () => {
           TaskList
         </Typography>
         <TaskForm saveTask={saveTaskHandler} />
-        <TaskList tasks={tasks} deleteTask={deleteTask} />
+        <TaskList
+          checkedTask={checkedTask}
+          tasks={tasks}
+          deleteTask={deleteTask}
+        />
       </Container>
     </>
   );
